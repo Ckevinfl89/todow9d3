@@ -1,17 +1,36 @@
-import React from "react";
 import { ITask } from "../Interfaces";
+import { useState } from "react";
 
 interface Props {
   task: ITask;
   completeTask(taskNameToDelete: string): void;
+  editTask(taskNameToEdit: string, newTaskName: string): void;
 }
 
-const TodoTask = ({ task, completeTask }: Props) => {
+const TodoTask = ({ task, completeTask, editTask }: Props) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [newTaskName, setNewTaskName] = useState(task.taskName);
+
+  const handleEdit = () => {
+    editTask(task.taskName, newTaskName);
+    setIsEditing(false);
+  };
+
   return (
     <div className="task">
       <div className="content">
-        <span>{task.taskName}</span>
-        <span>{task.deadline}</span>
+        {isEditing ? (
+          <input
+            type="text"
+            value={newTaskName}
+            onChange={(e) => setNewTaskName(e.target.value)}
+          />
+        ) : (
+          <>
+            <span>{task.taskName}</span>
+            <span>{task.deadline}</span>
+          </>
+        )}
       </div>
       <button
         onClick={() => {
@@ -20,6 +39,11 @@ const TodoTask = ({ task, completeTask }: Props) => {
       >
         X
       </button>
+      {isEditing ? (
+        <button onClick={handleEdit}>Submit</button>
+      ) : (
+        <button onClick={() => setIsEditing(true)}>Edit</button>
+      )}
     </div>
   );
 };

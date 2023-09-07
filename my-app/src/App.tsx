@@ -1,46 +1,43 @@
-import React, { FC, ChangeEvent, useState, useEffect } from "react";
-import "./App.css";
-import TodoTask from "./Components/TodoTask";
-import { ITask } from "./Interfaces";
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import TodoTask from './Components/TodoTask';
+import { ITask } from './Interfaces';
 
-const App: FC = () => {
+function App() {
   const [task, setTask] = useState<string>("");
-  const [deadline, setDealine] = useState<number>(0);
+  const [deadline, setDeadline] = useState<number>(0);
   const [todoList, setTodoList] = useState<ITask[]>([]);
-  const [flashMessage, setFlashMessage] = useState<string | null>(null);
+  const [flashMessage, setFlashMessage] = useState<string>("");
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    if (event.target.name === "task") {
-      setTask(event.target.value);
-    } else {
-      setDealine(Number(event.target.value));
-    }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.name === "task") setTask(event.target.value);
+    if (event.target.name === "deadline") setDeadline(Number(event.target.value));
   };
 
   const addTask = (): void => {
-    const newTask = { taskName: task, deadline: deadline  };
+    const newTask = { taskName: task, deadline: deadline };
     setTodoList([...todoList, newTask]);
     setTask("");
-    setDealine(0);
-    setFlashMessage('Task added successfully!');
+    setDeadline(0);
   };
 
   const completeTask = (taskNameToDelete: string): void => {
+    setTodoList(todoList.filter((task) => task.taskName !== taskNameToDelete));
+  };
+
+  const editTask = (taskNameToEdit: string, newTaskName: string): void => {
     setTodoList(
-      todoList.filter((task) => {
-        return task.taskName != taskNameToDelete;
-      })
+      todoList.map((task) =>
+        task.taskName === taskNameToEdit ? { ...task, taskName: newTaskName } : task
+      )
     );
-    setFlashMessage('Task deleted successfully!');
   };
 
   useEffect(() => {
-    if (flashMessage) {
+    if (flashMessage !== "") {
       const timer = setTimeout(() => {
-        setFlashMessage(null);
-      }, 3000); // Clear the flash message after 3 seconds
-
-      // Clear the timeout if the component is unmounted
+        setFlashMessage("");
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [flashMessage]);
@@ -51,7 +48,6 @@ const App: FC = () => {
         <div className="inputContainer">
           <input
             type="text"
-            
             placeholder="Task..."
             name="task"
             value={task}
@@ -67,16 +63,14 @@ const App: FC = () => {
         </div>
         <button onClick={addTask}>Add Task</button>
       </div>
-      {flashMessage && <div className="flash-message">{flashMessage}</div>}
       <div className="todoList">
         {todoList.map((task: ITask, key: number) => {
-          return <TodoTask key={key} task={task} completeTask={completeTask} />;
+          return <TodoTask key={key} task={task} completeTask={completeTask} editTask={editTask} />;
         })}
       </div>
-      
+      {flashMessage && <div className="flashMessage">{flashMessage}</div>}
     </div>
   );
-};
+}
 
 export default App;
-
