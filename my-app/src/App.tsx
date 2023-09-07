@@ -19,10 +19,12 @@ function App() {
     setTodoList([...todoList, newTask]);
     setTask("");
     setDeadline(0);
+    setFlashMessage("Task added successfully!");
   };
 
   const completeTask = (taskNameToDelete: string): void => {
     setTodoList(todoList.filter((task) => task.taskName !== taskNameToDelete));
+    setFlashMessage("Task deleted successfully!");
   };
 
   const editTask = (taskNameToEdit: string, newTaskName: string): void => {
@@ -31,6 +33,7 @@ function App() {
         task.taskName === taskNameToEdit ? { ...task, taskName: newTaskName } : task
       )
     );
+    setFlashMessage("Task edited successfully!");
   };
 
   useEffect(() => {
@@ -63,12 +66,12 @@ function App() {
         </div>
         <button onClick={addTask}>Add Task</button>
       </div>
+      {flashMessage && <div className="flashMessage">{flashMessage}</div>}
       <div className="todoList">
         {todoList.map((task: ITask, key: number) => {
           return <TodoTask key={key} task={task} completeTask={completeTask} editTask={editTask} />;
         })}
       </div>
-      {flashMessage && <div className="flashMessage">{flashMessage}</div>}
     </div>
   );
 }
